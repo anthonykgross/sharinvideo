@@ -1,0 +1,17 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_driver: pdo_mysql
+    database_host: ${{DATABASE_HOST}}
+    database_port: null
+    database_name: ${{DATABASE_NAME}}
+    database_user: ${{DATABASE_USER}}
+    database_password: ${{DATABASE_PASSWORD}}
+    database_server_version: ${{DATABASE_VERSION}}
+    mailer_transport: smtp
+    mailer_host: in-v3.mailjet.com
+    mailer_auth_mode: login
+    mailer_port: 587
+    mailer_user: ${{MAILER_USER}}
+    mailer_password: ${{MAILER_PASSWORD}}
+    locale: en
+    secret: 88a11acdfab4e23e075c86c57f564feb0921f3fd

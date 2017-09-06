@@ -1,0 +1,20 @@
+
+<form class="middle" action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="form_mid form_create_joueur">
+    <div class="row">
+        {{ form_label(form.username) }}{{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}{{ form_errors(form.username) }}
+    </div>
+    <div class="row">
+        {{ form_label(form.email) }}{{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}{{ form_errors(form.email) }}
+    </div>
+    <div class="row">
+        {{ form_label(form.plainPassword.first) }}{{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}{{ form_errors(form.plainPassword) }}
+    </div>
+    <div class="row">
+        {{ form_label(form.plainPassword.second) }}{{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    {{ form_widget(form._token) }}
+    <div class="row">
+        <br/>
+        <button type="submit" class="btn">{{ 'registration.submit'|trans({}, 'FOSUserBundle') }}</button>
+    </div>
+</form>

@@ -1,0 +1,22 @@
+{
+  "name": "Sharinvideo.com",
+  "version": "0.0.1",
+  "authors": [
+    "Anthony K GROSS <anthony.k.gross@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "web/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "socket.io-client": "~1.4.5",
+    "jwplayer": "6.10",
+    "jquery-ui": "~1.11.4",
+    "theme":"https://github.com/BlackrockDigital/startbootstrap-landing-page/archive/v1.0.5.zip"
+  }
+}

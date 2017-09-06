@@ -1,0 +1,24 @@
+sharinvideo:
+  image: r.cfcr.io/anthonykgross/anthonykgross/sharinvideo:master
+  volumes:
+    - ./conf/php5:/etc/php5
+    - ./conf/supervisor:/etc/supervisor/conf.d
+    - ./conf/nginx:/etc/nginx
+    - ./src:/src
+    - ./logs:/logs
+  ports:
+    - 2337:2337
+  links:
+    - mysql:mysql
+  ports:
+    - 80:80
+
+mysql:
+  image: anthonykgross/docker-mysql-backup-cron:latest
+  volumes:
+    - ./lib:/var/lib/mysql
+  ports:
+    - 3306:3306
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: symfony

@@ -1,0 +1,28 @@
+{% extends 'SharingVideoBundle::base.html.twig' %}
+
+{% block javascripts %}
+    <script src="{{ asset('bundles/sharingvideo/js/jwplayerSlave.js') }}"></script>
+    <script>
+        var master = '{{user}}';
+    </script>
+{% endblock %}
+
+{% block body %} 
+    <div class="intro">
+        <div class="container">
+            <div class="row">
+                <div id="screen">
+                    <div id="mediaplayer">Loading the player ...</div>
+                </div>
+                <div class="col-lg-12" style="text-align: center;">
+                    <label for="sync">Synchronize</label>
+                    <input type="checkbox" checked="checked" id="sync" /> 
+                </div>
+                <div class="col-lg-12">
+                    <label>History</label>
+                    <ul id="message"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

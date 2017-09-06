@@ -1,0 +1,15 @@
+/logs/*.log
+/src/app/cache/*
+/src/app/logs/*
+!src/app/cache/.gitkeep
+!src/app/logs/.gitkeep
+
+# Assets and user uploads
+/src/web/bundles/
+/src/web/uploads/
+
+/src/vendor
+/src/node_modules
+/nbproject/private/
+.idea
+/src/app/config/parameters.yml
