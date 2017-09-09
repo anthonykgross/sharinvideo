@@ -6,17 +6,16 @@ sharinvideo:
     - ./conf/nginx:/etc/nginx
     - ./src:/src
     - ./logs:/logs
-  ports:
-    - 2337:2337
   links:
     - mysql:mysql
   ports:
     - 80:80
+    - 2337:2337
 
 mysql:
   image: anthonykgross/docker-mysql-backup-cron:latest
   volumes:
-    - ./lib:/var/lib/mysql
+    - ./db:/var/lib/mysql
   ports:
     - 3306:3306
   environment:

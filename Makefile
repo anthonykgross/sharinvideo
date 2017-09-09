@@ -7,7 +7,7 @@ install:
 	docker-compose run sharinvideo install
 
 debug:
-	docker run -it --rm --entrypoint=/bin/bash $(NAME):master
+	docker-compose run sharinvideo bash
 
 run:
 	docker-compose up

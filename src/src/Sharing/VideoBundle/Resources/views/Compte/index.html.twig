@@ -1,11 +1,6 @@
 {% extends 'SharingVideoBundle::base.html.twig' %}
 
-{% block javascripts %}
-    <script src="{{ asset('bundles/sharingvideo/js/Compte/jwplayerMaster.js') }}"></script>
-    <script>
-        var master = 'kkuet';
-    </script>
-{% endblock %}
+
 
 {% block body %} 
     <div class="intro">
@@ -19,7 +14,9 @@
                     </span>
                 </div>
                 <div id="screen">
-                    <div id="mediaplayer">Loading the player ...</div>
+                    <div id="mediaplayer">
+                        <span>Loading the player ...</span>
+                    </div>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon" id="share-url">Share link</span> 
@@ -32,4 +29,45 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        var master = '{{ app.user.username }}';
+        var videoUrl = '';
+        var timer;
+
+        $(function(){
+            $('#btn_valid_url').on('click', function(){
+                videoUrl = $('#urlVideo').val();
+                var videoId = getYoutubeVideoId(videoUrl);
+                refreshYoutubePlayer(videoId);
+                socket.emit('master_event_change', {seconds: 0, videoUrl: videoUrl,  event: 'onChange'});
+            });
+        });
+
+        socket.emit('master_new', {master: master});
+
+        socket.on('message', function(message){
+            newMessage(message);
+        });
+
+        function onPlayerStateChange(event) {
+            if(event.data === 1) {
+                socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl,  event: 'onPlay'});
+
+                timer = setInterval(function() {
+                    socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl, event: 'onTime'});
+                }, delay*1000);
+            }
+            if(event.data === 2) {
+                socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl, event: 'onPause'});
+                clearInterval(timer);
+            }
+            if(event.data === 3) {
+                socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl, event: 'onBuffer'});
+                clearInterval(timer);
+            }
+        }
+    </script>
 {% endblock %}
