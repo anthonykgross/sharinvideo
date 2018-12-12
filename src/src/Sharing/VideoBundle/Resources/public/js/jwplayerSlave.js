@@ -1,5 +1,5 @@
 $(function(){
-    var socket = io.connect("http://"+document.domain+":2337");
+    var socket = io.connect("https://"+document.domain+":2337");
     var locked      = false;
     
     socket.emit('init', {master: master});

@@ -1,6 +1,6 @@
 $(function(){
-    var urlVideo    = "http://www.youtube.com/watch?v=_0sklzHtlns";
-    var socket      = io.connect("http://"+document.domain+":2337");
+    var urlVideo    = "https://www.youtube.com/watch?v=OiY3aZYJGTI";
+    var socket      = io.connect("https://"+document.domain+":2337");
     var delai       = 5;
     var locked      = false;
     

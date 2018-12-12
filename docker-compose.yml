@@ -6,12 +6,11 @@ sharinvideo:
     - ./conf/nginx:/etc/nginx
     - ./src:/src
     - ./logs:/logs
-  ports:
-    - 2337:2337
   links:
     - mysql:mysql
   ports:
     - 80:80
+    - 2337:2337
 
 mysql:
   image: anthonykgross/docker-mysql-backup-cron:latest
