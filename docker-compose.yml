@@ -15,7 +15,7 @@ sharinvideo:
 mysql:
   image: anthonykgross/docker-mysql-backup-cron:latest
   volumes:
-    - ./lib:/var/lib/mysql
+    - ./db:/var/lib/mysql
   ports:
     - 3306:3306
   environment:

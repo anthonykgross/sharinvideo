@@ -16,6 +16,7 @@
   "dependencies": {
     "socket.io-client": "~1.4.5",
     "jquery-ui": "~1.11.4",
-    "theme":"https://github.com/BlackrockDigital/startbootstrap-landing-page/archive/v1.0.5.zip"
+    "theme": "https://github.com/BlackrockDigital/startbootstrap-landing-page/archive/v1.0.5.zip",
+    "moment": "^2.22.2"
   }
 }

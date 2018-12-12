@@ -13,3 +13,6 @@
 /nbproject/private/
 .idea
 /src/app/config/parameters.yml
+/db
+/src/web/libs
+/src/app/bootstrap.php.cache
