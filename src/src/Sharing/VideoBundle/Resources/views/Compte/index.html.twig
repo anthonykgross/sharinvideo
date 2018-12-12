@@ -3,7 +3,7 @@
 {% block javascripts %}
     <script src="{{ asset('bundles/sharingvideo/js/Compte/jwplayerMaster.js') }}"></script>
     <script>
-        var master = 'kkuet';
+        var master = '{{ app.user.username }}';
     </script>
 {% endblock %}
 
