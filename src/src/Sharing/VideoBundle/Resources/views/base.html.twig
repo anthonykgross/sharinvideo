@@ -114,8 +114,41 @@
     <script src="{{ asset('libs/moment/min/moment.min.js') }}"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        var base_url = '{{app.request.baseurl()}}';
+        {% set host = app.request.server.get('HTTP_HOST') %}
+
+        {% set scheme = "http" %}
+        {% if app.request.server.get('HTTPS') == 'on' %}
+            {% set scheme = "https" %}
+        {% endif %}
+
+        {% set socketUrl = scheme ~ "://" ~ host ~ ':2337' %}
+
+        var socket = io.connect("{{ socketUrl }}");
+        var elm = $('#mediaplayer');
+        var delay = 1;
+        var player;
+
+        function newMessage(message){
+            var date = moment().format('hh:mm:ss');
+            var li = $('<li/>').html(date+' : '+message);
+            $('#message').prepend(li);
+        }
+
+        function refreshYoutubePlayer(url) {
+            elm.html('');
+            var container = $('<div />').attr('id', 'yt_player');
+            elm.append(container);
+
+            player = new YT.Player(
+                container.attr('id'), {
+                    videoId: url,
+                    events: {
+                        'onStateChange': onPlayerStateChange
+                    }
+                }
+            );
+        }
     </script>
-{% block javascripts %}{% endblock %}
+    {% block javascripts %}{% endblock %}
 </body>
 </html>

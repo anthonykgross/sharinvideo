@@ -1,12 +1,5 @@
 {% extends 'SharingVideoBundle::base.html.twig' %}
 
-{% block javascripts %}
-    <script src="{{ asset('bundles/sharingvideo/js/jwplayerSlave.js') }}"></script>
-    <script>
-        var master = '{{user}}';
-    </script>
-{% endblock %}
-
 {% block body %} 
     <div class="intro">
         <div class="container">
@@ -25,4 +18,61 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        var master = '{{user}}';
+        var synchronization = true;
+
+        $(function(){
+            $("#sync").on('click', function () {
+                synchronization = $(this).is(':checked');
+            });
+        });
+
+        socket.emit('slave_ready', {master: master});
+
+        socket.on('message', function(message){
+            newMessage(message);
+        });
+
+        socket.on('new_video', function(j){
+            refreshYoutubePlayer(j.url);
+        });
+
+        socket.on('event_change', function(j){
+            if(synchronization){
+                if(j && player){
+                    if(j.event==='onPlay'){
+                        player.playVideo();
+                    }
+                    if(j.event==='onPause'){
+                        player.pauseVideo();
+                    }
+                    if(j.event==='onBuffer'){
+                        player.seekTo(j.seconds);
+                        player.playVideo();
+                    }
+                    if(j.event==='onTime'){
+                        var currentTime = player.getCurrentTime();
+
+                        if(currentTime < j.seconds-(delay/2) || currentTime > j.seconds+(delay/2)) {
+                            player.seekTo(j.seconds);
+                        }
+                    }
+                }
+            }
+        });
+
+        function onPlayerStateChange(event) {
+            if(event.data === 2) {
+                socket.emit('slave_wait', {master: master});
+            }
+            if(event.data === 3) {
+                socket.emit('slave_wait', {master: master});
+            }
+        }
+
+    </script>
 {% endblock %}

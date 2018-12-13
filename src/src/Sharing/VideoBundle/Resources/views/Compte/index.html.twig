@@ -1,11 +1,6 @@
 {% extends 'SharingVideoBundle::base.html.twig' %}
 
-{% block javascripts %}
-    <script src="{{ asset('bundles/sharingvideo/js/Compte/jwplayerMaster.js') }}"></script>
-    <script>
-        var master = '{{ app.user.username }}';
-    </script>
-{% endblock %}
+
 
 {% block body %} 
     <div class="intro">
@@ -32,4 +27,42 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        var master = '{{ app.user.username }}';
+
+        $(function(){
+            $('#btn_valid_url').on('click', function(){
+                var urlVideo = $('#urlVideo').val();
+                socket.emit('master_ready', {url: urlVideo, master: master});
+                refreshYoutubePlayer(urlVideo);
+            });
+        });
+
+
+
+        socket.on('message', function(message){
+            newMessage(message);
+        });
+
+        function onPlayerStateChange(event) {
+            if(event.data === 1) {
+                socket.emit('event_change', {master: master, data: event, seconds: player.getCurrentTime(), event: 'onPlay'});
+            }
+            if(event.data === 2) {
+                socket.emit('event_change', {master: master, data: event, seconds: player.getCurrentTime(), event: 'onPause'});
+            }
+            if(event.data === 3) {
+                socket.emit('event_change', {master: master, data: event, seconds: player.getCurrentTime(), event: 'onBuffer'});
+            }
+        }
+
+        // setInterval(function() {
+        //     if (player) {
+        //         socket.emit('event_change', {master: master, data: {}, seconds: player.getCurrentTime(), event: 'onTime'});
+        //     }
+        // }, delay*1000);
+    </script>
 {% endblock %}
