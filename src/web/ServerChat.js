@@ -43,6 +43,23 @@ function Channel(master) {
         this.emitMaster(event, data);
         this.emitSlaves(event, data);
     };
+
+    this.removeByIoSocketID = function(iosocketId) {
+
+        if(this.master) {
+            if (this.master.ioSocket.id === iosocketId) {
+                delete this.master;
+            }
+        }
+
+        for (var index = 0; index < this.slaves.length; index++) {
+            var slave = this.slaves[index];
+
+            if(slave.ioSocket.id === iosocketId) {
+                this.slaves.slice(index, 1);
+            }
+        }
+    };
 }
 
 var ChannelList = {
@@ -100,9 +117,9 @@ var ChannelList = {
                 }
             }
 
-            channel.slaves.forEach((socket) => {
-                if (iosocketId === socket.ioSocket.id) {
-                    c = socket;
+            channel.slaves.forEach((slave) => {
+                if (iosocketId === slave.ioSocket.id) {
+                    c = channel;
                 }
             });
         });
@@ -124,15 +141,17 @@ var ChannelList = {
 };
 
 io.sockets.on('connection', function (socket) {
-    socket.on('slave_ready', function (d) {
+    socket.on('slave_new', function (d) {
         var channel = ChannelList.createChannel(d.master);
         var slave = new Socket('slave', null, socket);
         channel.addSlave(slave);
+        console.log(channel);
     });
 
-    socket.on('master_ready', function (d) {
+    socket.on('master_new', function (d) {
         var channel = ChannelList.createChannel(d.master);
         channel.master = new Socket('master', d.master, socket);
+        console.log(channel);
     });
 
     socket.on('slave_wait', function (d) {
@@ -149,6 +168,9 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         var channel = ChannelList.getChannelByIOSocket(socket.id);
+        if (channel) {
+            channel.removeByIoSocketID(socket.id);
+        }
     });
 });
 server.listen(PORT_SOCKETIO_SERVER);

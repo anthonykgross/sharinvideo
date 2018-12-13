@@ -31,7 +31,7 @@
             });
         });
 
-        socket.emit('slave_ready', {master: master});
+        socket.emit('slave_new', {master: master});
 
         socket.on('message', function(message){
             newMessage(message);

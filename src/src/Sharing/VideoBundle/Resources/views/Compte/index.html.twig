@@ -41,7 +41,7 @@
             });
         });
 
-
+        socket.emit('master_new', {master: master});
 
         socket.on('message', function(message){
             newMessage(message);
