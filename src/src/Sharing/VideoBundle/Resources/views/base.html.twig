@@ -115,7 +115,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         {% set host = app.request.server.get('HTTP_HOST') %}
-        {% set socketUrl = "://" ~ host ~ ':2337' %}
+        {% set socketUrl = scheme ~ "://" ~ host ~ ':2337' %}
 
         var socket = io.connect("{{ socketUrl }}");
         var elm = $('#mediaplayer');
