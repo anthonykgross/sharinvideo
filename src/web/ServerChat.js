@@ -6,6 +6,7 @@ var PORT_SOCKETIO_SERVER = 2337;
 
 var server = http.createServer();
 var io = socketio.listen(server);
+io.set( 'origins', '*anthonykgross.fr*:*' )
 
 function Socket(type, name, ioSocket) {
     this.ioSocket = ioSocket;
@@ -27,7 +28,9 @@ function Channel(master) {
     };
 
     this.emitMaster = function (event, data) {
-        this.master.ioSocket.emit(event, data);
+        if (this.master) {
+            this.master.ioSocket.emit(event, data);
+        }
     };
 
     this.emitSlaves= function (event, data) {
@@ -45,7 +48,6 @@ function Channel(master) {
     };
 
     this.removeByIoSocketID = function(iosocketId) {
-
         if(this.master) {
             if (this.master.ioSocket.id === iosocketId) {
                 delete this.master;
@@ -56,9 +58,30 @@ function Channel(master) {
             var slave = this.slaves[index];
 
             if(slave.ioSocket.id === iosocketId) {
-                this.slaves.slice(index, 1);
+                this.slaves = this.slaves.slice(index, index);
             }
         }
+    };
+
+    /**
+     * @param iosocketId
+     * @returns Socket | null
+     */
+    this.getSocketByIOSocket = function(iosocketId) {
+        var c;
+
+        if (this.master) {
+            if (iosocketId === this.master.ioSocket.id) {
+                c = this.master;
+            }
+        }
+
+        this.slaves.forEach((slave) => {
+            if (iosocketId === slave.ioSocket.id) {
+                c = slave;
+            }
+        });
+        return c;
     };
 }
 
@@ -87,20 +110,6 @@ var ChannelList = {
     },
 
     /**
-     * @param name
-     * @returns {Boolean}
-     */
-    masterConnected: function(name){
-        var channel = (this.getChannelByMasterName(name));
-        var ok = (channel);
-
-        if (ok) {
-            ok = (channel.master);
-        }
-        return ok;
-    },
-
-    /**
      * @param iosocketId
      * @returns Channel | null
      */
@@ -109,19 +118,10 @@ var ChannelList = {
 
         Object.keys(this.channels).forEach((name) => {
             var channel = this.channels[name];
-            var master = channel.master;
 
-            if (master) {
-                if (iosocketId === master.ioSocket.id) {
-                    c = channel;
-                }
+            if (channel.getSocketByIOSocket(iosocketId)) {
+                c = channel;
             }
-
-            channel.slaves.forEach((slave) => {
-                if (iosocketId === slave.ioSocket.id) {
-                    c = channel;
-                }
-            });
         });
         return c;
     },
@@ -142,33 +142,40 @@ var ChannelList = {
 
 io.sockets.on('connection', function (socket) {
     socket.on('slave_new', function (d) {
+        console.log('slave_new', d);
         var channel = ChannelList.createChannel(d.master);
         var slave = new Socket('slave', null, socket);
         channel.addSlave(slave);
-        console.log(channel);
+        channel.emitAll('message', 'New slave connected.');
     });
 
     socket.on('master_new', function (d) {
+        console.log('slave_new', d);
         var channel = ChannelList.createChannel(d.master);
         channel.master = new Socket('master', d.master, socket);
-        console.log(channel);
+        channel.emitAll('message', d.master+' connected.');
     });
 
     socket.on('slave_wait', function (d) {
-        console.log(d);
+        console.log('slave_wait', d);
     });
 
-    socket.on('event_change', function (d) {
-        console.log(d);
-        var channel = ChannelList.getChannelByMasterName(d.master);
+    socket.on('master_event_change', function (d) {
+        console.log('master_event_change', d);
+        var channel = ChannelList.getChannelByIOSocket(socket.id);
         if (channel) {
-            channel.emitAll('event_change', d);
+            channel.emitSlaves('master_event_change', d);
         }
     });
 
-    socket.on('disconnect', function () {
+    socket.on('disconnect', function (d) {
+        console.log('disconnect', d);
         var channel = ChannelList.getChannelByIOSocket(socket.id);
         if (channel) {
+            var sock = channel.getSocketByIOSocket(socket.id);
+            var type = sock.type.charAt(0).toUpperCase()+sock.type.slice(1);
+
+            channel.emitAll('message', type+ ' disconnected.');
             channel.removeByIoSocketID(socket.id);
         }
     });

@@ -14,11 +14,13 @@
                     </span>
                 </div>
                 <div id="screen">
-                    <div id="mediaplayer">Loading the player ...</div>
+                    <div id="mediaplayer">
+                        <span>Loading the player ...</span>
+                    </div>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon" id="share-url">Share link</span> 
-                    <input type="text" class="form-control" id="basic-url" aria-describedby="share-url" value="http://{{ app.request.host ~ path('client_user', {user: app.user.username})}}" />
+                    <input type="text" class="form-control" id="basic-url" aria-describedby="share-url" value="https://{{ app.request.host ~ path('client_user', {user: app.user.username})}}" />
                 </div>
                 <div class="col-lg-12">
                     <label>History</label>
@@ -32,12 +34,15 @@
 {% block javascripts %}
     <script>
         var master = '{{ app.user.username }}';
+        var videoUrl = '';
+        var timer;
 
         $(function(){
             $('#btn_valid_url').on('click', function(){
-                var urlVideo = $('#urlVideo').val();
-                socket.emit('master_ready', {url: urlVideo, master: master});
-                refreshYoutubePlayer(urlVideo);
+                videoUrl = $('#urlVideo').val();
+                var videoId = getYoutubeVideoId(videoUrl);
+                refreshYoutubePlayer(videoId);
+                socket.emit('master_event_change', {seconds: 0, videoUrl: videoUrl,  event: 'onChange'});
             });
         });
 
@@ -49,20 +54,20 @@
 
         function onPlayerStateChange(event) {
             if(event.data === 1) {
-                socket.emit('event_change', {master: master, data: event, seconds: player.getCurrentTime(), event: 'onPlay'});
+                socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl,  event: 'onPlay'});
+
+                timer = setInterval(function() {
+                    socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl, event: 'onTime'});
+                }, delay*1000);
             }
             if(event.data === 2) {
-                socket.emit('event_change', {master: master, data: event, seconds: player.getCurrentTime(), event: 'onPause'});
+                socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl, event: 'onPause'});
+                clearInterval(timer);
             }
             if(event.data === 3) {
-                socket.emit('event_change', {master: master, data: event, seconds: player.getCurrentTime(), event: 'onBuffer'});
+                socket.emit('master_event_change', {seconds: player.getCurrentTime(), videoUrl: videoUrl, event: 'onBuffer'});
+                clearInterval(timer);
             }
         }
-
-        // setInterval(function() {
-        //     if (player) {
-        //         socket.emit('event_change', {master: master, data: {}, seconds: player.getCurrentTime(), event: 'onTime'});
-        //     }
-        // }, delay*1000);
     </script>
 {% endblock %}
